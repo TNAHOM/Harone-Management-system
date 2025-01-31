@@ -199,3 +199,45 @@ The application uses Docker Compose with:
 For technical support and inquiries:
 - Email: support@swiftconnect.com
 - Issue Tracking: GitHub Issues
+
+## User Profiles and Requirements
+
+### User Profiles
+
+1. **Business Customer**
+   - Needs to submit onboarding requests and track their status.
+   - Requires a user-friendly interface for document uploads and status updates.
+
+2. **CRM Processor**
+   - Responsible for reviewing and processing onboarding requests.
+   - Needs efficient tools for filtering, reviewing, and updating request statuses.
+
+3. **Administrator**
+   - Manages users and oversees system operations.
+   - Requires access to user management tools and system statistics.
+
+4. **Auditor**
+   - Monitors request processing and ensures compliance.
+   - Needs access to detailed reports and request histories.
+
+### Requirements
+
+#### Functional Requirements
+- **Authentication**: Secure login and registration for all user roles.
+- **Request Submission**: Business customers can submit onboarding requests with necessary documents.
+- **Request Processing**: CRM processors can review, approve, or reject requests.
+- **User Management**: Administrators can create and manage user accounts.
+- **Reporting**: Auditors can generate and view detailed reports.
+
+#### Non-Functional Requirements
+- **Security**: Ensure data protection through encryption and secure authentication.
+- **Usability**: Provide an intuitive and user-friendly interface.
+- **Performance**: Ensure the system can handle multiple concurrent users without performance degradation.
+- **Scalability**: Design the system to accommodate future growth in user base and data volume.
+
+### Wireframe Description for CRM Module Request Processing Screens
+
+The CRM module's request processing screens will include:
+- A **Dashboard** displaying a list of all requests with filters for status (All, Pending, Approved, Rejected).
+- A **Request Detail View** where processors can see detailed information about each request, including uploaded documents and comments.
+- A **Review Interface** with options to approve or reject requests, add comments, and update the request status.
