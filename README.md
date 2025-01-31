@@ -80,15 +80,17 @@ A comprehensive customer relationship management system designed for SWIFT netwo
    # Edit .env with your configurations
    ```
 
-3. Start the application:
+3. Start the MariaDB service:
    ```bash
-   docker-compose up -d
+   docker-compose up -d db
    ```
 
 4. Access the application:
    ```
    http://localhost:5000
    ```
+
+Note: The application itself is not containerized. Only the MariaDB database is run in a Docker container. Follow the Local Development Setup for running the application.
 
 ## Local Development Setup
 
