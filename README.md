@@ -2,8 +2,6 @@
 
 A comprehensive customer relationship management system designed for SWIFT network connectivity onboarding. This system streamlines business customer documentation processing and management.
 
-![Docker Container](screenshoots/docker-container.png)
-
 ## Core Features
 
 ### Authentication System 🔐
@@ -89,6 +87,8 @@ A comprehensive customer relationship management system designed for SWIFT netwo
    ```
    http://localhost:5000
    ```
+   
+![Docker Container](screenshoots/docker-container.png)
 
 Note: The application itself is not containerized. Only the MariaDB database is run in a Docker container. Follow the Local Development Setup for running the application.
 
