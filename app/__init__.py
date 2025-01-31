@@ -5,7 +5,7 @@ from flask_mail import Mail
 from flask_migrate import Migrate
 from app.config.config import Config
 
-# Initialize extensions
+
 db = SQLAlchemy()
 login_manager = LoginManager()
 mail = Mail()
@@ -15,7 +15,6 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    # Initialize Flask extensions
     db.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
@@ -29,7 +28,7 @@ def create_app(config_class=Config):
         from app.models import User
         return User.query.get(int(user_id))
 
-    # Register blueprints
+    # its a blueprint
     from app.routes.auth import auth_bp
     from app.routes.main import main_bp
     from app.routes.admin import admin_bp
@@ -38,11 +37,9 @@ def create_app(config_class=Config):
     app.register_blueprint(main_bp)
     app.register_blueprint(admin_bp)
 
-    # Register CLI commands
     from app.commands import create_admin
     app.cli.add_command(create_admin)
 
-    # Create database tables
     with app.app_context():
         db.create_all()
 

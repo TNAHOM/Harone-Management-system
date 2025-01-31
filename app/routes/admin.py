@@ -15,7 +15,7 @@ def generate_random_password(length=12):
     return ''.join(secrets.choice(alphabet) for i in range(length))
 
 def admin_required(f):
-    @wraps(f)  # This preserves the original function's name and metadata
+    @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated or current_user.role != 'admin':
             abort(403)
@@ -40,21 +40,19 @@ def add_user():
         flash('Email already registered', 'error')
         return redirect(url_for('admin.users'))
     
-    # Generate a random password for the internal user
     password = generate_random_password()
     
     user = User(
         email=email,
         password_hash=generate_password_hash(password),
         role=role,
-        is_verified=True  # Internal users don't need email verification
+        is_verified=True
     )
     
     try:
         db.session.add(user)
         db.session.commit()
         
-        # Display the generated password to the admin
         flash(f'User added successfully. Please provide these credentials to the user:', 'success')
         flash(f'Email: {email}', 'info')
         flash(f'Temporary Password: {password}', 'info')

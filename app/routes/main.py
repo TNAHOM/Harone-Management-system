@@ -10,16 +10,13 @@ import os
 main_bp = Blueprint('main', __name__)
 
 def save_file(file, prefix):
-    """Helper function to save uploaded files"""
-    # Get the original file extension
     _, ext = os.path.splitext(file.filename)
-    # Create a unique filename
     filename = f"{prefix}_{current_user.id}_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}{ext}"
-    # Get the full path
     upload_folder = os.path.join(current_app.root_path, current_app.config['UPLOAD_FOLDER'])
+
     os.makedirs(upload_folder, exist_ok=True)
     filepath = os.path.join(upload_folder, filename)
-    # Save the file
+
     file.save(filepath)
     return filename
 
@@ -32,7 +29,7 @@ def index():
 def dashboard():
     if current_user.role == 'business':
         requests = OnboardingRequest.query.filter_by(user_id=current_user.id).all()
-        form = FlaskForm()  # Create an empty form for CSRF protection
+        form = FlaskForm()
         return render_template('business_dashboard.html', requests=requests, form=form)
     elif current_user.role in ['processor', 'admin', 'auditor']:
         requests = OnboardingRequest.query.all()
@@ -44,7 +41,7 @@ def dashboard():
             'avg_processing_time': '0 days'  # Default value
         }
         
-        # Calculate average processing time for completed requests
+        # Calculate average processing timeh
         completed_requests = OnboardingRequest.query.filter(
             OnboardingRequest.status.in_(['approved', 'rejected']),
             OnboardingRequest.processed_at.isnot(None)
@@ -56,7 +53,7 @@ def dashboard():
                 for request in completed_requests
             )
             avg_time = total_time / len(completed_requests)
-            avg_days = round(avg_time / (24 * 3600), 1)  # Convert to days
+            avg_days = round(avg_time / (24 * 3600), 1)
             stats['avg_processing_time'] = f"{avg_days} days"
         
         return render_template('crm_dashboard.html', requests=requests, stats=stats)
@@ -68,7 +65,7 @@ def view_request(request_id):
     if current_user.role == 'business' and onboarding_request.user_id != current_user.id:
         abort(403)
     
-    # Return JSON data for AJAX requests
+
     if request.headers.get('Accept') == 'application/json':
         return jsonify({
             'id': onboarding_request.id,
@@ -84,7 +81,6 @@ def view_request(request_id):
             'comments': onboarding_request.comments
         })
     
-    # Return HTML for direct browser requests
     return render_template('request_details.html', request=onboarding_request)
 
 @main_bp.route('/submit_request', methods=['POST'])
