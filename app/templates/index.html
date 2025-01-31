@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome - CRM System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1>Welcome to the CRM System</h1>
+        <p class="lead">This is a simple CRM system for managing customer relationships.</p>
+        
+        {% if not current_user.is_authenticated %}
+        <div class="mt-4">
+            <a href="{{ url_for('auth.login') }}" class="btn btn-primary me-2">Login</a>
+            <a href="{{ url_for('auth.signup') }}" class="btn btn-outline-primary">Sign Up</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

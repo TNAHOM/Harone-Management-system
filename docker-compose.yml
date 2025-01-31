@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  db:
+    image: mariadb:10.6
+    container_name: crm
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 243313@Nt
+      MYSQL_DATABASE: crm
+      MYSQL_USER: crm_user
+      MYSQL_PASSWORD: 243313@Nt
+    ports:
+      - "3306:3306"
+    volumes:
+      - swift_connect_data:/var/lib/mysql
+
+volumes:
+  swift_connect_data: 

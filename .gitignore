@@ -1,0 +1,27 @@
+# Environment files
+.env
+.env.*
+
+# Python environment
+venv/
+
+# Compiled Python files
+__pycache__/
+*.pyc
+*.pyo
+
+# Database files
+*.db
+
+# Logs
+*.log
+
+# Docker files
+*.pid
+*.sock
+
+# Uploads
+uploads/
+
+# Secrets
+config.py 

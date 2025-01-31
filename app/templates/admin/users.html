@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}User Management - CRM System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2>User Management</h2>
+        
+        <!-- Add User Form -->
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="card-title">Add Internal User</h5>
+                <form method="POST" action="{{ url_for('admin.add_user') }}">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="role" class="form-label">Role</label>
+                                <select class="form-select" id="role" name="role" required>
+                                    <option value="processor">Processor</option>
+                                    <option value="auditor">Auditor</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="submit" class="btn btn-primary d-block">Add User</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Users List -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title">Users</h5>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Business Name</th>
+                                <th>Verified</th>
+                                <th>Created</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>{{ user.email }}</td>
+                                <td><span class="badge bg-{{ 'primary' if user.role == 'admin' else 'info' if user.role == 'processor' else 'secondary' if user.role == 'auditor' else 'success' }}">{{ user.role|title }}</span></td>
+                                <td>{{ user.business_name or '-' }}</td>
+                                <td>
+                                    {% if user.is_verified %}
+                                    <span class="text-success">✓</span>
+                                    {% else %}
+                                    <span class="text-danger">✗</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

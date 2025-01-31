@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}Business Dashboard - SWIFT Connect{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>Welcome, {{ current_user.business_name }}</h2>
+    </div>
+    <div class="col text-end">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newRequestModal">
+            New Onboarding Request
+        </button>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3>Your Onboarding Requests</h3>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-primary active" onclick="filterRequests('all')">All</button>
+                <button type="button" class="btn btn-outline-primary" onclick="filterRequests('pending')">Pending</button>
+                <button type="button" class="btn btn-outline-primary" onclick="filterRequests('approved')">Approved</button>
+                <button type="button" class="btn btn-outline-primary" onclick="filterRequests('rejected')">Rejected</button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Request ID</th>
+                        <th>Status</th>
+                        <th>Submitted Date</th>
+                        <th>Last Updated</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in requests %}
+                    <tr class="request-row" data-status="{{ request.status }}">
+                        <td>#{{ request.id }}</td>
+                        <td>
+                            <span class="badge bg-{{ 'success' if request.status == 'approved' else 'danger' if request.status == 'rejected' else 'warning' }}">
+                                {{ request.status.title() }}
+                            </span>
+                        </td>
+                        <td>{{ request.submitted_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ request.processed_at.strftime('%Y-%m-%d %H:%M') if request.processed_at else 'N/A' }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-info" onclick="viewRequest({{ request.id }})">View Details</button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">No requests found. Create your first onboarding request!</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- New Request Modal -->
+<div class="modal fade" id="newRequestModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Onboarding Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('main.submit_request') }}" enctype="multipart/form-data">
+                {{ form.csrf_token if form }}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="business_name" class="form-label">Business Name</label>
+                        <input type="text" class="form-control" id="business_name" name="business_name" value="{{ current_user.business_name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="business_type" class="form-label">Business Type</label>
+                        <select class="form-control" id="business_type" name="business_type" required>
+                            <option value="">Select Business Type</option>
+                            <option value="Sole Proprietorship">Sole Proprietorship</option>
+                            <option value="Partnership">Partnership</option>
+                            <option value="Corporation">Corporation</option>
+                            <option value="LLC">LLC</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="contact_number" class="form-label">Contact Number</label>
+                        <input type="tel" class="form-control" id="contact_number" name="contact_number" pattern="[0-9\+\-\(\)\s]+" required>
+                        <small class="form-text text-muted">Enter a valid phone number (e.g., +1-234-567-8900)</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="business_address" class="form-label">Business Address</label>
+                        <textarea class="form-control" id="business_address" name="business_address" rows="2" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="business_license" class="form-label">Business License</label>
+                        <input type="file" class="form-control" id="business_license" name="business_license" accept=".pdf,.jpg,.jpeg,.png" required>
+                        <small class="form-text text-muted">Accepted formats: PDF, JPG, JPEG, PNG</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tax_id" class="form-label">Tax ID Document</label>
+                        <input type="file" class="form-control" id="tax_id" name="tax_id" accept=".pdf,.jpg,.jpeg,.png" required>
+                        <small class="form-text text-muted">Accepted formats: PDF, JPG, JPEG, PNG</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="additional_notes" class="form-label">Additional Notes</label>
+                        <textarea class="form-control" id="additional_notes" name="additional_notes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- View Request Modal -->
+<div class="modal fade" id="viewRequestModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Request Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="requestDetails">
+                Loading...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    // Initialize Bootstrap modals
+    $('.modal').modal({
+        backdrop: 'static',
+        keyboard: false
+    });
+
+    // Add click handlers for filter buttons
+    $('.btn-group .btn').on('click', function() {
+        const status = $(this).text().toLowerCase();
+        filterRequests(status);
+    });
+});
+
+function filterRequests(status) {
+    // Update active button state
+    $('.btn-group .btn').removeClass('active');
+    $(`.btn-group .btn:contains(${status})`).addClass('active');
+    
+    // Filter rows
+    $('.request-row').each(function() {
+        const rowStatus = $(this).data('status');
+        $(this).toggle(status === 'all' || rowStatus === status);
+    });
+}
+
+function viewRequest(requestId) {
+    const modal = new bootstrap.Modal(document.getElementById('viewRequestModal'));
+    document.getElementById('requestDetails').innerHTML = 'Loading...';
+    modal.show();
+    
+    // Fetch request details
+    fetch(`/request/${requestId}`, {
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        document.getElementById('requestDetails').innerHTML = `
+            <dl class="row">
+                <dt class="col-sm-3">Business Name</dt>
+                <dd class="col-sm-9">${data.business_name}</dd>
+                
+                <dt class="col-sm-3">Business Type</dt>
+                <dd class="col-sm-9">${data.business_type}</dd>
+                
+                <dt class="col-sm-3">Contact Number</dt>
+                <dd class="col-sm-9">${data.contact_number}</dd>
+                
+                <dt class="col-sm-3">Business Address</dt>
+                <dd class="col-sm-9">${data.business_address}</dd>
+                
+                <dt class="col-sm-3">Status</dt>
+                <dd class="col-sm-9">
+                    <span class="badge bg-${data.status === 'approved' ? 'success' : data.status === 'rejected' ? 'danger' : 'warning'}">
+                        ${data.status.charAt(0).toUpperCase() + data.status.slice(1)}
+                    </span>
+                </dd>
+                
+                <dt class="col-sm-3">Submitted</dt>
+                <dd class="col-sm-9">${new Date(data.submitted_at).toLocaleString()}</dd>
+                
+                <dt class="col-sm-3">Documents</dt>
+                <dd class="col-sm-9">
+                    <div><a href="/download/${data.business_license}" target="_blank">Business License</a></div>
+                    <div><a href="/download/${data.tax_id}" target="_blank">Tax ID Document</a></div>
+                </dd>
+                
+                ${data.comments ? `
+                    <dt class="col-sm-3">Comments</dt>
+                    <dd class="col-sm-9">${data.comments}</dd>
+                ` : ''}
+            </dl>
+        `;
+    })
+    .catch(error => {
+        document.getElementById('requestDetails').innerHTML = 'Error loading request details.';
+        console.error('Error:', error);
+    });
+}
+</script>
+{% endblock %} 
