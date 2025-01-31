@@ -11,6 +11,5 @@ class User(UserMixin, db.Model):
     is_verified = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
-    # Relationships
     requests = db.relationship('OnboardingRequest', backref='user', lazy=True, foreign_keys='OnboardingRequest.user_id')
     processed_requests = db.relationship('OnboardingRequest', backref='processor', lazy=True, foreign_keys='OnboardingRequest.processed_by') 

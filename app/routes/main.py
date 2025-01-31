@@ -38,7 +38,7 @@ def dashboard():
         stats = {
             'pending_count': OnboardingRequest.query.filter_by(status='pending').count(),
             'business_count': User.query.filter_by(role='business').count(),
-            'avg_processing_time': '0 days'  # Default value
+            'avg_processing_time': '0 days'
         }
         
         # Calculate average processing timeh
@@ -89,14 +89,14 @@ def submit_request():
     if current_user.role != 'business':
         abort(403)
     
-    # Validate required form fields
+    # validations
     required_fields = ['business_name', 'business_type', 'contact_number', 'business_address']
     for field in required_fields:
         if not request.form.get(field):
             flash(f'{field.replace("_", " ").title()} is required.', 'error')
             return redirect(url_for('main.dashboard'))
     
-    # Handle file uploads
+
     business_license_file = request.files.get('business_license')
     tax_id_file = request.files.get('tax_id')
     
@@ -105,11 +105,10 @@ def submit_request():
         return redirect(url_for('main.dashboard'))
     
     try:
-        # Save files
         business_license_filename = save_file(business_license_file, 'license')
         tax_id_filename = save_file(tax_id_file, 'tax')
         
-        # Create new onboarding request
+        # Creating ' onboarding request
         new_request = OnboardingRequest(
             user_id=current_user.id,
             business_name=request.form['business_name'],
@@ -137,16 +136,13 @@ def submit_request():
 @login_required
 def download_file(filename):
     try:
-        # Get the file path
         upload_folder = os.path.join(current_app.root_path, current_app.config['UPLOAD_FOLDER'])
         filepath = os.path.join(upload_folder, filename)
         
-        # Check if the file exists
         if not os.path.exists(filepath):
             flash('File not found.', 'error')
             return redirect(url_for('main.dashboard'))
         
-        # Get the file extension and set MIME type
         _, ext = os.path.splitext(filename)
         mime_types = {
             '.pdf': 'application/pdf',
@@ -156,11 +152,10 @@ def download_file(filename):
         }
         mime_type = mime_types.get(ext.lower(), 'application/octet-stream')
         
-        # For images and PDFs, display in browser
         return send_file(
             filepath,
             mimetype=mime_type,
-            as_attachment=False  # This will display in browser instead of downloading
+            as_attachment=False
         )
     except Exception as e:
         print("Error downloading file:", str(e))
